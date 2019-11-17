@@ -1,0 +1,31 @@
+{
+  "name": "blog-backend",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "watch": "nodemon index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pimpbot9000/full-stack-2019-part4.git"
+  },
+  "author": "Tuomas Välimäki",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/pimpbot9000/full-stack-2019-part4/issues"
+  },
+  "homepage": "https://github.com/pimpbot9000/full-stack-2019-part4#readme",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^8.2.0",
+    "eslint": "^6.6.0",
+    "express": "^4.17.1",
+    "mongoose": "^5.7.11"
+  },
+  "devDependencies": {
+    "nodemon": "^1.19.4"
+  }
+}
