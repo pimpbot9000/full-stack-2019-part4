@@ -1,5 +1,5 @@
 const config = require('./utils/config')
-//const middleware = require('./utils/middleware')
+const middleware = require('./utils/middleware')
 const express = require('express')
 const bodyParser = require('body-parser')
 const app = express()
@@ -19,6 +19,7 @@ mongoose.connect(config.MONGODB_URI, { useNewUrlParser: true })
 
 app.use(cors())
 app.use(bodyParser.json())
+app.use(middleware.morganCustom)
 app.use('/api/posts', postsRouter)
 
 module.exports = app
