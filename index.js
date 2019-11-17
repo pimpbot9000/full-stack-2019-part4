@@ -1,4 +1,4 @@
-console.log("Starting blog backend app")
+console.log('Starting blog backend app')
 
 const app = require('./app')
 const http = require('http')

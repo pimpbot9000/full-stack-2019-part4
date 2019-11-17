@@ -1,3 +1,7 @@
+/**
+ * Test database connection
+ */
+
 const mongoose = require('mongoose')
 const config = require('./utils/config')
 const Post = require('./models/post')
