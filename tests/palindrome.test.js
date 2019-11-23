@@ -1,19 +1,23 @@
 const palindrome = require('../utils/for_testing').palindrome
 
-test('palindrome of a', () => {
-  const result = palindrome('a')
+describe('average', () => {
 
-  expect(result).toBe('a')
-})
+  test('palindrome of a', () => {
+    const result = palindrome('a')
 
-test('palindrome of react', () => {
-  const result = palindrome('react')
+    expect(result).toBe('a')
+  })
 
-  expect(result).toBe('tcaer')
-})
+  test('palindrome of react', () => {
+    const result = palindrome('react')
 
-test('palindrome of saippuakauppias', () => {
-  const result = palindrome('saippuakauppias')
+    expect(result).toBe('tcaer')
+  })
 
-  expect(result).toBe('saippuakauppias')
+  test('palindrome of saippuakauppias', () => {
+    const result = palindrome('saippuakauppias')
+
+    expect(result).toBe('saippuakauppias')
+  })
+
 })

@@ -18,6 +18,6 @@ const newPost = new Post({
 })
 
 newPost.save().then(_response => {
-  console.log('note saved!');
-  mongoose.connection.close();
+  console.log('note saved!')
+  mongoose.connection.close()
 }).catch(error => next(error))
