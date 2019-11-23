@@ -8,12 +8,12 @@ const totalLikes = (blogs) => {
 }
 
 const favouritePost = (blogs) => {
-  return blogs.reduce( (previous, next) => next.likes > previous.likes ? next : previous)
+  return blogs.reduce((previous, next) => next.likes > previous.likes ? next : previous)
 }
 
-const mostBlogs = array => {
-  if(array.length === 0) return null
-  
+const mostLikes = array => {
+  if (array.length === 0) return null
+
   let bestValue = 0
   let bestAuthor = null
   const map = new Map()
@@ -23,16 +23,15 @@ const mostBlogs = array => {
 
     const value = map.get(element.author)
     let newValue = 0
-    if( value == null){
+    if (value == null) {
       newValue = element.likes
-      map.set(element.author, element.likes)
-
     } else {
       newValue = element.likes + value
-      map.set(element.author, newValue)           
     }
 
-    if(newValue > bestValue){
+    map.set(element.author, element.likes)
+
+    if (newValue > bestValue) {
       bestValue = newValue
       bestAuthor = element.author
     }
@@ -45,8 +44,38 @@ const mostBlogs = array => {
   }
 }
 
+const mostBlogs = array => {
+  const map = new Map()
+
+  let bestValue = 0
+  let bestAuthor = null
+
+  array.forEach(element => {
+    let newValue = 0
+    const value = map.get(element.author)
+    if (value == null) {
+      newValue = 1
+    } else {
+      newValue = value + 1
+    }
+
+    map.set(element.author, newValue)
+
+    if (newValue > bestValue) {
+      bestValue = newValue
+      bestAuthor = element.author
+    }
+  })
+
+  return {
+    author: bestAuthor,
+    blogs: bestValue
+  }
+}
+
 module.exports = {
   dummy,
+  mostLikes,
   mostBlogs,
   totalLikes,
   favouritePost

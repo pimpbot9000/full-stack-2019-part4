@@ -13,16 +13,6 @@ const average = array => {
   return array.length === 0 ? 0 : array.reduce(reducer, 0) / array.length
 }
 
-const mostBlogs = array => {
-  let best = 0
-  const authors = {}
-
-  array.forEach(element => {
-    console.log(authors[element])
-  })
-
-}
-
 module.exports = {
   palindrome,
   average,
