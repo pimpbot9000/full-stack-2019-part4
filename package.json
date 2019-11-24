@@ -20,11 +20,13 @@
   },
   "homepage": "https://github.com/pimpbot9000/full-stack-2019-part4#readme",
   "dependencies": {
+    "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "mongoose": "^5.7.11",
-    "morgan": "^1.9.1"
+    "morgan": "^1.9.1",
+    "nvm": "0.0.4"
   },
   "devDependencies": {
     "cross-env": "^6.0.3",
