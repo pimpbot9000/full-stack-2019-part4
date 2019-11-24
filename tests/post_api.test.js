@@ -102,14 +102,14 @@ describe('with initial data in the DB', () => {
     })
   })
 
-  describe('update existing post', () => {
+  describe('update post', () => {
 
-    test('correctly updated likes', async () => {
+    test('correct update works', async () => {
       const posts = await helper.getPosts()
       const firstPost = posts[0]
 
       const updatedPost = {
-        ...firstPost,
+        ...firstPost,        
         likes: firstPost.likes + 1
       }
 
@@ -122,11 +122,24 @@ describe('with initial data in the DB', () => {
       expect(result.body.likes).toBe(firstPost.likes + 1)
     })
 
-    test('update item not found with properly formatted id should return 404', async () => {
+    test('updating existing post with empty body should not change the entry', async () => {
+      const posts = await helper.getPosts()
+      const firstPost = posts[0]
+      const url = `/api/posts/${firstPost.id}`
+
+      const result = await api
+        .put(url)
+        .send({})
+        .expect(200)
+      
+      expect(result.body).toEqual(firstPost)
+    })
+
+    test('update item not found should return 404', async () => {
       const id = await helper.nonExistingId()
       await api
         .put(`/api/posts/${id}`)
-        .send({title: 'this is a title', author: 'some author'})
+        .send()
         .expect(404)
     })
 
@@ -136,6 +149,42 @@ describe('with initial data in the DB', () => {
         .send({title: 'this is a title', author: 'some author'})
         .expect(400)
     })
+
+  })
+
+  describe('delete post', () => {
+    test('delete existing post', async () => {
+      let posts = await helper.getPosts()
+      const nofPosts = posts.length
+      const firstPost = posts[0]
+      
+      await api
+        .delete(`/api/posts/${firstPost.id}`)
+        .send()
+        .expect(200)   
+      
+      posts = await helper.getPosts()
+      const nofPostsAfterDelete = posts.length
+
+      expect(nofPostsAfterDelete).toBe(nofPosts - 1)
+
+    })
+
+    test('delete nonexisting post with properly formatted id (should return 200)', async () => {
+      const id = await helper.nonExistingId()
+      await api
+        .delete(`/api/posts/${id}`)
+        .send()
+        .expect(200)
+    })
+
+    test('delete post with malformatted id (should return 400: bad request )', async () => {
+      await api
+        .delete('/api/posts/xxx')
+        .send()
+        .expect(400)
+    })
+
 
   })
 

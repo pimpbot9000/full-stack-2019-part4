@@ -17,15 +17,9 @@ postsRouter.post('/', async (request, response, next) => {
   }
 })
 
-postsRouter.put('/:id', async (request, response, next) => {
-  const body = request.body
-
-  const newPost = {
-    title: body.title,
-    author: body.author,
-    url: body.url ? body.url : '',
-    likes: body.likes ? body.likes : 0
-  }
+postsRouter.put('/:id', async (request, response, next) => {  
+ 
+  const newPost = request.body 
 
   try {
     const updatedPost = await Post.findByIdAndUpdate(request.params.id, newPost, { new: true })
@@ -35,6 +29,18 @@ postsRouter.put('/:id', async (request, response, next) => {
       response.status(404).end()
     }
 
+  } catch (error) {
+    next(error)
+  }
+
+})
+
+postsRouter.delete('/:id', async (request, response, next) => {
+  const id = request.params.id
+  
+  try {
+    await Post.findByIdAndRemove(id)
+    response.status(200).end()
   } catch (error) {
     next(error)
   }
