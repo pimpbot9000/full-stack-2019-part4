@@ -2,10 +2,22 @@ const mongoose = require('mongoose')
 //const uniqueValidator = require('mongoose-unique-validator')
 
 const postSchema = new mongoose.Schema({
-  title: String,
-  author: String,
-  url: String,
-  likes: Number
+  title: {
+    type: String,
+    required: true
+  },
+  author: {
+    type: String,
+    required: true
+  },
+  url: {
+    type: String,
+    required: false
+  },
+  likes: {
+    type: Number,
+    default: 0 //does not work with update and findOneAndUpdate
+  }
 })
 
 postSchema.set('toJSON', {
