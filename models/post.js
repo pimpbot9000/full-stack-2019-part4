@@ -18,6 +18,7 @@ const postSchema = new mongoose.Schema({
     type: Number,
     default: 0 //does not work with update and findOneAndUpdate
   },
+
   user: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User'

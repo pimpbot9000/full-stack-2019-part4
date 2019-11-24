@@ -2,12 +2,6 @@ const bcryptjs = require('bcryptjs')
 const usersRouter = require('express').Router()
 const User = require('../models/user')
 
-/*usersRouter.get('/', (_request, response) => {
-  User.find({}).then(persons => {
-    response.json(persons.map(person => person.toJSON()))
-  })
-})*/
-
 usersRouter.get('/', async (_request, response, next) => {
   try {
     const users = await User.find({})
