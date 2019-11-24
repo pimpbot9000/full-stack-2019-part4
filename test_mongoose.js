@@ -17,7 +17,7 @@ const newPost = new Post({
   likes: 123
 })
 
-newPost.save().then(_response => {
+newPost.save().then( () => {
   console.log('note saved!')
   mongoose.connection.close()
-}).catch(error => next(error))
+}).catch(error => console.log(error))

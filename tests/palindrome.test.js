@@ -1,6 +1,6 @@
 const palindrome = require('../utils/for_testing').palindrome
 
-describe('average', () => {
+describe('palindrome', () => {
 
   test('palindrome of a', () => {
     const result = palindrome('a')
