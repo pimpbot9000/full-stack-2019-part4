@@ -40,9 +40,7 @@ describe('when initially only one user in the db', () => {
     }
 
     const usersInitially = await helper.getUsers()
-    console.log("USERS INITIALLY!", usersInitially)
-    console.log("VREATE NEW USER!", newUser)
-
+    
     const result = await api
       .post('/api/users')
       .send(newUser)
@@ -55,6 +53,32 @@ describe('when initially only one user in the db', () => {
     expect(usersAfter.length).toBe(usersInitially.length)
 
   })
+})
+
+describe('creating a new user the user match requirements', () => {
+
+  test('if password is too short, new user will not be created', async () => {
+    await User.deleteMany({})
+
+    const newUser = {
+      username: 'root',
+      name: 'Admin',
+      password: 'a',
+    }
+
+    const result = await api
+      .post('/api/users')
+      .send(newUser)
+      .expect(400)
+      .expect('Content-Type', /application\/json/)
+
+    expect(result.body.error).toContain('too short')
+
+    const usersAfter = await helper.getUsers()
+
+    expect(usersAfter.length).toBe(0)
+  })
+
 })
 
 afterAll(() => {

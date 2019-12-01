@@ -15,6 +15,14 @@ const initialPosts = [
   },
 ]
 
+const initialUsers = [
+  {
+    username: 'root',
+    name: 'admin',
+    password: 'swordfish'
+  }
+]
+
 const getPosts = async () => {
   const posts = await Post.find({})
   return posts.map(post => post.toJSON())
@@ -30,6 +38,7 @@ const nonExistingId = async () => {
 
 module.exports = {
   initialPosts,
+  initialUsers,
   getPosts,
   nonExistingId
 }

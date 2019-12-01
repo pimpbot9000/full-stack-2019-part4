@@ -2,8 +2,10 @@ const mongoose = require('mongoose')
 const supertest = require('supertest')
 const app = require('../app')
 const Post = require('../models/post')
+const User = require('../models/user')
 const api = supertest(app)
 const helper = require('./post_api_test_helper')
+const usersHelper = require('./user_api_test_helper')
 
 /**
  * Create test database
@@ -11,6 +13,8 @@ const helper = require('./post_api_test_helper')
 beforeEach(async () => {
   await Post.deleteMany({})
   await Post.insertMany(helper.initialPosts)
+  await User.deleteMany({})
+  await User.insertMany(helper.initialUsers)
 })
 
 describe('with initial data in the DB', () => {
@@ -47,15 +51,18 @@ describe('with initial data in the DB', () => {
   })
 
   describe('add new post', () => {
-    test('new post can be added ', async () => {
-
+    test('new post can be added for a specific user', async () => {
+            
+      const users = await usersHelper.getUsers()
+      
       const title = 'async/await simplifies making async calls'
 
       const newPost = {
         title: title,
         author: 'Tumppu3',
         url: 'zzz',
-        likes: 0
+        likes: 0,
+        userId: users[0].id
       }
 
       await api
@@ -74,6 +81,28 @@ describe('with initial data in the DB', () => {
       )
     })
 
+    test('new post cannot be added without userId', async () => {
+      const title = 'async/await simplifies making async calls'
+
+      const postsInitially = await helper.getPosts()
+      const newPost = {
+        title: title,
+        author: 'Tumppu3',
+        url: 'zzz',
+        likes: 0        
+      }
+
+      await api
+        .post('/api/posts')
+        .send(newPost)
+        .expect(400) //201 created
+        .expect('Content-Type', /application\/json/)
+
+      const postsAfter = await helper.getPosts()
+
+      expect(postsInitially.length).toBe(postsAfter.length)
+    })
+
     test('a new post with not all required fields cannot be added', async () => {
       const newPost = {
         title: 'This is a title'
@@ -90,6 +119,7 @@ describe('with initial data in the DB', () => {
     })
 
     test('a new post with value for likes not provided will get 0 likes by default', async () => {
+      
       const newPostObj = new Post({
         title: 'This is a title',
         author: 'User',
@@ -184,7 +214,6 @@ describe('with initial data in the DB', () => {
         .send()
         .expect(400)
     })
-
 
   })
 

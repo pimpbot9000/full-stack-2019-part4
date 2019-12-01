@@ -2,9 +2,19 @@ const postsRouter = require('express').Router()
 const Post = require('../models/post')
 const User = require('../models/user')
 
-postsRouter.get('/', async (_request, response) => {
-  const posts = await Post.find({})
-  response.json(posts.map(person => person.toJSON()))
+postsRouter.get('/', async (request, response) => {
+
+  let posts = null
+
+  const include = request.query.include ? request.query.include.split(',') : []
+
+  if (include.includes('user')) {
+    posts = await Post.find({}).populate('user')
+  } else {
+    posts = await Post.find({}).populate('user', {username: 1})
+  }
+
+  response.json(posts.map(post => post.toJSON()))
 })
 
 postsRouter.post('/', async (request, response, next) => {
@@ -12,7 +22,8 @@ postsRouter.post('/', async (request, response, next) => {
   const body = request.body
 
   const user = await User.findById(body.userId)
-  if(!user){
+
+  if (!user) {
     return response.status(400).json('user not found').end()
   }
 
@@ -22,7 +33,7 @@ postsRouter.post('/', async (request, response, next) => {
     url: body.url,
     user: user._id
   })
-  
+
   try {
     const savedPost = await newPost.save()
     user.posts = user.posts.concat(savedPost._id)
@@ -33,9 +44,9 @@ postsRouter.post('/', async (request, response, next) => {
   }
 })
 
-postsRouter.put('/:id', async (request, response, next) => {  
- 
-  const newPost = request.body 
+postsRouter.put('/:id', async (request, response, next) => {
+
+  const newPost = request.body
 
   try {
     const updatedPost = await Post.findByIdAndUpdate(request.params.id, newPost, { new: true })
@@ -53,7 +64,7 @@ postsRouter.put('/:id', async (request, response, next) => {
 
 postsRouter.delete('/:id', async (request, response, next) => {
   const id = request.params.id
-  
+
   try {
     await Post.findByIdAndRemove(id)
     response.status(200).end()
