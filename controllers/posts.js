@@ -1,5 +1,6 @@
 const postsRouter = require('express').Router()
 const Post = require('../models/post')
+const User = require('../models/user')
 
 postsRouter.get('/', async (_request, response) => {
   const posts = await Post.find({})
@@ -7,11 +8,26 @@ postsRouter.get('/', async (_request, response) => {
 })
 
 postsRouter.post('/', async (request, response, next) => {
-  const newPost = new Post(request.body)
 
+  const body = request.body
+
+  const user = await User.findById(body.userId)
+  if(!user){
+    return response.status(400).json('user not found').end()
+  }
+
+  const newPost = new Post({
+    title: body.title,
+    author: body.author,
+    url: body.url,
+    user: user._id
+  })
+  
   try {
-    const result = await newPost.save()
-    response.status(201).json(result.toJSON)
+    const savedPost = await newPost.save()
+    user.posts = user.posts.concat(savedPost._id)
+    await user.save()
+    response.status(201).json(savedPost.toJSON)
   } catch (exception) {
     next(exception)
   }

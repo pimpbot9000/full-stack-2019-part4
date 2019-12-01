@@ -2,9 +2,19 @@ const bcryptjs = require('bcryptjs')
 const usersRouter = require('express').Router()
 const User = require('../models/user')
 
-usersRouter.get('/', async (_request, response, next) => {
+usersRouter.get('/', async (request, response, next) => {
   try {
-    const users = await User.find({})
+
+    
+    let users = null
+    const include = request.query.include.split(',')
+
+    if(include.includes('posts')){
+      users = await User.find({}).populate('posts', {title: 1})
+    } else {
+      users = await User.find({})
+    }
+
     response.json(users.map(user => user.toJSON()))
   } catch (error) {
     next(error)
@@ -14,7 +24,6 @@ usersRouter.get('/', async (_request, response, next) => {
 usersRouter.post('/', async (request, response, next) => {
   try {
     const body = request.body
-
     const saltRounds = 10
     const passwordHash = await bcryptjs.hash(body.password, saltRounds)
 

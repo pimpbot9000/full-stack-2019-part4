@@ -2,7 +2,8 @@ POST http://localhost:3002/api/posts
 Content-Type: application/json
 
 {
-    "title": "test",
-    "author": "Tumppu",
-    "url": "this is an url"
+    "title": "title2",
+    "author": "authori!",
+    "url": "this is an url",
+    "userId": "5de39fe59862e53234b051e1"
 }
