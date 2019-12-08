@@ -7,7 +7,8 @@
     "start": "cross-env NODE_ENV=production node index.js",
     "watch": "cross-env NODE_ENV=development nodemon index.js",
     "test": "cross-env NODE_ENV=test jest --verbose --runInBand",
-    "test_mongoose": "cross-env NODE_ENV=test node test_mongoose.js"
+    "test_mongoose": "cross-env NODE_ENV=test node test_mongoose.js",
+    "lint": "eslint ."
   },
   "repository": {
     "type": "git",

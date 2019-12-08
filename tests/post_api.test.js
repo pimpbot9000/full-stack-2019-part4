@@ -116,7 +116,7 @@ describe('with initial data in the DB', () => {
       await api
         .post('/api/posts')
         .send(newPost)
-        .set({ Authorization: "bearer xxxxxxxxxx12234" })
+        .set({ Authorization: 'bearer xxxxxxxxxx12234' })
         .expect(401) //401 unauthorized
         .expect('Content-Type', /application\/json/)
 
@@ -192,7 +192,7 @@ describe('with initial data in the DB', () => {
       const posts = await helper.getPosts()
       const post = posts[0]
       const user = helper.initialUsers[0]
-      authString = await login(user.username, user.password)
+      const authString = await login(user.username, user.password)
 
       const updatedPost = {
         ...post,
@@ -215,7 +215,7 @@ describe('with initial data in the DB', () => {
       const posts = await helper.getPosts()
       const post = posts[0]
       const user = helper.initialUsers[1]
-      authString = await login(user.username, user.password)
+      const authString = await login(user.username, user.password)
 
       const updatedPost = {
         ...post,
@@ -236,7 +236,7 @@ describe('with initial data in the DB', () => {
       const posts = await helper.getPosts()
       const post = posts[0]
       const user = helper.initialUsers[0]
-      authString = await login(user.username, user.password)
+      const authString = await login(user.username, user.password)
       const url = `/api/posts/${post.id}`
 
       const result = await api
@@ -254,7 +254,7 @@ describe('with initial data in the DB', () => {
 
     test('update item not found should return 404', async () => {
       const user = helper.initialUsers[0]
-      authString = await login(user.username, user.password)
+      const authString = await login(user.username, user.password)
 
       const id = await helper.nonExistingId()
       await api
@@ -266,7 +266,7 @@ describe('with initial data in the DB', () => {
 
     test('update item with malformmatted id should return 400', async () => {
       const user = helper.initialUsers[0]
-      authString = await login(user.username, user.password)
+      const authString = await login(user.username, user.password)
 
       await api
         .put('/api/posts/xxx')
@@ -282,7 +282,7 @@ describe('with initial data in the DB', () => {
 
       let posts = await helper.getPosts()
       const user = helper.initialUsers[0]
-      authString = await login(user.username, user.password)
+      const authString = await login(user.username, user.password)
 
       const nofPosts = posts.length
       const firstPost = posts[0]
@@ -304,7 +304,7 @@ describe('with initial data in the DB', () => {
 
       let posts = await helper.getPosts()
       const user = helper.initialUsers[1]
-      authString = await login(user.username, user.password)
+      const authString = await login(user.username, user.password)
 
       const nofPosts = posts.length
       const firstPost = posts[0]
@@ -324,7 +324,7 @@ describe('with initial data in the DB', () => {
 
     test('delete nonexisting post with properly formatted id (should return 200)', async () => {
       const user = helper.initialUsers[0]
-      authString = await login(user.username, user.password)
+      const authString = await login(user.username, user.password)
       
       const id = await helper.nonExistingId()
       await api
@@ -336,7 +336,7 @@ describe('with initial data in the DB', () => {
 
     test('delete post with malformatted id (should return 400: bad request )', async () => {
       const user = helper.initialUsers[0]
-      authString = await login(user.username, user.password)
+      const authString = await login(user.username, user.password)
 
       await api
         .delete('/api/posts/xxx')
@@ -357,8 +357,7 @@ afterAll(() => {
  * Helper method to login user
  */
 const login = async (username, password) => {
-  const user = helper.initialUsers[0]
-
+  
   const loginRequest = {
     username, password
   }
