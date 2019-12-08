@@ -1,9 +1,11 @@
-POST http://localhost:3002/api/posts
+POST http://localhost:3001/api/posts
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InBpbXBib3Q5MDAwIiwiaWQiOiI1ZGViYzA0MGRhMzljNTJlN2NmYTNmMTYiLCJpYXQiOjE1NzU3MzE4NDJ9.rb0cFZSpLpafVSfnA7hEp70-EXzBr4tyw0VhR1qCiPY
 
 {
-    "title": "title2",
-    "author": "authori!",
+    "title": "test",
+    "author": "Tumppu",
     "url": "this is an url",
-    "userId": "5de39fe59862e53234b051e1"
+    "likes": 99,
+    "userId": "5debc040da39c52e7cfa3f16"
 }

@@ -4,23 +4,27 @@ const app = require('../app')
 const api = supertest(app)
 const mongoose = require('mongoose')
 
+const testUser = {
+  username: 'root',
+  name: 'admin',
+  password: 'swordfish'
+}
 /**
  * Test initialization: Create user
  */
 beforeEach(async () => {
   await User.deleteMany({})
-  await User.createUser('root', 'admin', 'swordfish')
+  await User.createUser(testUser)
 })
 
 
 describe('with user already in database', () => {
 
-
   test('can login as user with correct password', async () => {
 
     const loginRequest = {
-      username: 'root',
-      password: 'swordfish'
+      username: testUser.username,
+      password: testUser.password
     }
 
     await api

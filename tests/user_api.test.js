@@ -2,7 +2,6 @@ const User = require('../models/user')
 const mongoose = require('mongoose')
 const supertest = require('supertest')
 const app = require('../app')
-const Post = require('../models/post')
 const api = supertest(app)
 const helper = require('./user_api_test_helper')
 

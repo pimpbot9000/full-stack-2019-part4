@@ -29,25 +29,24 @@ userSchema.set('toJSON', {
     returnedObject.id = returnedObject._id.toString()
     delete returnedObject._id
     delete returnedObject.__v
-    // the passwordHash should not be revealed
     delete returnedObject.passwordHash
   }
 })
 
 const User = mongoose.model('User', userSchema)
 
-User.createUser = async (username, name, password) => {
+User.createUser = async (user) => {
 
   const saltRounds = 10
-  const passwordHash = await bcryptjs.hash(password, saltRounds)
+  const passwordHash = await bcryptjs.hash(user.password, saltRounds)
 
-  const user = new User({
-    username,
-    name,
+  const userObj = new User({
+    username: user.username,
+    name: user.name,
     passwordHash,
   })
 
-  return user.save()
+  return userObj.save()
 }
 
 module.exports = User

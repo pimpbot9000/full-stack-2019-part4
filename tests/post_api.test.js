@@ -8,13 +8,28 @@ const helper = require('./post_api_test_helper')
 const usersHelper = require('./user_api_test_helper')
 
 /**
- * Create test database
+ * Initialize test database. 
+ * 1. Create a two users.
+ * 2. Create posts belonging to the first user of the list
  */
+
 beforeEach(async () => {
+
   await Post.deleteMany({})
-  await Post.insertMany(helper.initialPosts)
   await User.deleteMany({})
-  await User.insertMany(helper.initialUsers)
+
+  await User.createUser(helper.initialUsers[0])
+  await User.createUser(helper.initialUsers[1])
+  
+  const users = await usersHelper.getUsers()
+
+  const posts = helper.initialPosts.map(post => {
+    post.user = users[0].id
+    return post
+  })
+
+  await Post.insertMany(posts)
+
 })
 
 describe('with initial data in the DB', () => {
@@ -51,10 +66,12 @@ describe('with initial data in the DB', () => {
   })
 
   describe('add new post', () => {
-    test('new post can be added for a specific user', async () => {
-            
-      const users = await usersHelper.getUsers()
-      
+    test('new post can be added for a specific user with valid token', async () => {
+
+      //login user!
+      const user = helper.initialUsers[0]
+      const authString = await login(user.username, user.password)
+
       const title = 'async/await simplifies making async calls'
 
       const newPost = {
@@ -62,14 +79,16 @@ describe('with initial data in the DB', () => {
         author: 'Tumppu3',
         url: 'zzz',
         likes: 0,
-        userId: users[0].id
+        userId: user.id
       }
 
       await api
         .post('/api/posts')
         .send(newPost)
-        .expect(201) //201 == created
+        .set({ Authorization: authString })
+        .expect(201) //201 created
         .expect('Content-Type', /application\/json/)
+
 
       const response = await api.get('/api/posts')
 
@@ -81,29 +100,62 @@ describe('with initial data in the DB', () => {
       )
     })
 
-    test('new post cannot be added without userId', async () => {
+    test('a new post cannot be added with invalid token', async () => {
       const title = 'async/await simplifies making async calls'
 
       const postsInitially = await helper.getPosts()
+
       const newPost = {
         title: title,
         author: 'Tumppu3',
         url: 'zzz',
-        likes: 0        
+        likes: 0,
+        userId: 'xxx'
       }
 
       await api
         .post('/api/posts')
         .send(newPost)
-        .expect(400) //201 created
+        .set({ Authorization: "bearer xxxxxxxxxx12234" })
+        .expect(401) //401 unauthorized
         .expect('Content-Type', /application\/json/)
 
       const postsAfter = await helper.getPosts()
 
       expect(postsInitially.length).toBe(postsAfter.length)
+
+    })
+
+    test('a new post cannot be added with missing token', async () => {
+      const title = 'async/await simplifies making async calls'
+
+      const postsInitially = await helper.getPosts()
+
+      const newPost = {
+        title: title,
+        author: 'Tumppu3',
+        url: 'zzz',
+        likes: 0,
+        userId: 'xxx'
+      }
+
+      await api
+        .post('/api/posts')
+        .send(newPost)
+        .expect(401) //401 unauthorized
+        .expect('Content-Type', /application\/json/)
+
+      const postsAfter = await helper.getPosts()
+
+      expect(postsInitially.length).toBe(postsAfter.length)
+
     })
 
     test('a new post with not all required fields cannot be added', async () => {
+
+      const user = helper.initialUsers[0]
+      const authString = await login(user.username, user.password)
+
       const newPost = {
         title: 'This is a title'
       }
@@ -111,6 +163,7 @@ describe('with initial data in the DB', () => {
       await api
         .post('/api/posts')
         .send(newPost)
+        .set({ Authorization: authString })
         .expect(400) //bad request
 
       const posts = await helper.getPosts()
@@ -119,7 +172,7 @@ describe('with initial data in the DB', () => {
     })
 
     test('a new post with value for likes not provided will get 0 likes by default', async () => {
-      
+
       const newPostObj = new Post({
         title: 'This is a title',
         author: 'User',
@@ -134,65 +187,112 @@ describe('with initial data in the DB', () => {
 
   describe('update post', () => {
 
-    test('correct update works', async () => {
+    test('update works with valid authorization tokeni', async () => {
+
       const posts = await helper.getPosts()
-      const firstPost = posts[0]
+      const post = posts[0]
+      const user = helper.initialUsers[0]
+      authString = await login(user.username, user.password)
 
       const updatedPost = {
-        ...firstPost,        
-        likes: firstPost.likes + 1
+        ...post,
+        likes: post.likes + 1
       }
 
-      const url = `/api/posts/${firstPost.id}`
+      const url = `/api/posts/${post.id}`
 
       const result = await api
         .put(url)
+        .set({ Authorization: authString })
         .send(updatedPost)
+        .expect(200)
 
-      expect(result.body.likes).toBe(firstPost.likes + 1)
+      expect(result.body.likes).toBe(post.likes + 1)
+    })
+
+    test('update failes when user tries to update a post belonging to other user', async () => {
+
+      const posts = await helper.getPosts()
+      const post = posts[0]
+      const user = helper.initialUsers[1]
+      authString = await login(user.username, user.password)
+
+      const updatedPost = {
+        ...post,
+        likes: post.likes + 1
+      }
+
+      const url = `/api/posts/${post.id}`
+
+      await api
+        .put(url)
+        .set({ Authorization: authString })
+        .send(updatedPost)
+        .expect(401) //unauthorized
+
     })
 
     test('updating existing post with empty body should not change the entry', async () => {
       const posts = await helper.getPosts()
-      const firstPost = posts[0]
-      const url = `/api/posts/${firstPost.id}`
+      const post = posts[0]
+      const user = helper.initialUsers[0]
+      authString = await login(user.username, user.password)
+      const url = `/api/posts/${post.id}`
 
       const result = await api
         .put(url)
+        .set({ Authorization: authString })
         .send({})
         .expect(200)
       
-      expect(result.body).toEqual(firstPost)
+      expect(result.body.title).toBe(post.title)
+      expect(result.body.author).toBe(post.author)
+      expect(result.body.likes).toBe(post.likes)
+      expect(result.body.url).toBe(post.url)
+
     })
 
     test('update item not found should return 404', async () => {
+      const user = helper.initialUsers[0]
+      authString = await login(user.username, user.password)
+
       const id = await helper.nonExistingId()
       await api
         .put(`/api/posts/${id}`)
+        .set({ Authorization: authString })
         .send()
         .expect(404)
     })
 
     test('update item with malformmatted id should return 400', async () => {
+      const user = helper.initialUsers[0]
+      authString = await login(user.username, user.password)
+
       await api
         .put('/api/posts/xxx')
-        .send({title: 'this is a title', author: 'some author'})
+        .set({ Authorization: authString })
+        .send({ title: 'this is a title', author: 'some author' })
         .expect(400)
     })
 
   })
 
   describe('delete post', () => {
-    test('delete existing post', async () => {
+    test('delete existing post when post belongs to user and user is logged in', async () => {
+
       let posts = await helper.getPosts()
+      const user = helper.initialUsers[0]
+      authString = await login(user.username, user.password)
+
       const nofPosts = posts.length
       const firstPost = posts[0]
-      
+
       await api
         .delete(`/api/posts/${firstPost.id}`)
+        .set({ Authorization: authString })
         .send()
-        .expect(200)   
-      
+        .expect(200)
+
       posts = await helper.getPosts()
       const nofPostsAfterDelete = posts.length
 
@@ -200,17 +300,47 @@ describe('with initial data in the DB', () => {
 
     })
 
+    test('delete existing post when post belongs to another user', async () => {
+
+      let posts = await helper.getPosts()
+      const user = helper.initialUsers[1]
+      authString = await login(user.username, user.password)
+
+      const nofPosts = posts.length
+      const firstPost = posts[0]
+
+      await api
+        .delete(`/api/posts/${firstPost.id}`)
+        .set({ Authorization: authString })
+        .send()
+        .expect(401)
+
+      posts = await helper.getPosts()
+      const nofPostsAfterDelete = posts.length
+
+      expect(nofPostsAfterDelete).toBe(nofPosts)
+
+    })
+
     test('delete nonexisting post with properly formatted id (should return 200)', async () => {
+      const user = helper.initialUsers[0]
+      authString = await login(user.username, user.password)
+      
       const id = await helper.nonExistingId()
       await api
         .delete(`/api/posts/${id}`)
+        .set({ Authorization: authString })
         .send()
         .expect(200)
     })
 
     test('delete post with malformatted id (should return 400: bad request )', async () => {
+      const user = helper.initialUsers[0]
+      authString = await login(user.username, user.password)
+
       await api
         .delete('/api/posts/xxx')
+        .set({ Authorization: authString })
         .send()
         .expect(400)
     })
@@ -222,3 +352,23 @@ describe('with initial data in the DB', () => {
 afterAll(() => {
   mongoose.connection.close()
 })
+
+/**
+ * Helper method to login user
+ */
+const login = async (username, password) => {
+  const user = helper.initialUsers[0]
+
+  const loginRequest = {
+    username, password
+  }
+
+  const loginResult = await api
+    .post('/api/login')
+    .send(loginRequest)
+    .expect(200)
+    .expect('Content-Type', /application\/json/)
+
+  return `Bearer ${loginResult.body.token}`
+
+} 

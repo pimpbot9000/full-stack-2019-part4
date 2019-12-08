@@ -2,7 +2,7 @@ POST http://localhost:3002/api/users
 Content-Type: application/json
 
 {
-    "username": "pimpbot",
+    "username": "pimpbot9000",
     "name": "Tumppu Dumppu",
-    "password": "salasana"
+    "password": "salasana1"
 }

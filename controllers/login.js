@@ -5,7 +5,7 @@ const User = require('../models/user')
 require('dotenv').config()
 
 loginRouter.post('/', async (request, response) => {
-  console.log(process.env)
+
   const body = request.body
 
   const user = await User.findOne({ username: body.username })

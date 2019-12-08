@@ -20,6 +20,11 @@ const initialUsers = [
     username: 'root',
     name: 'admin',
     password: 'swordfish'
+  }, 
+  {
+    username: 'the_other_guy',
+    name: 'The Other Guy',
+    password: 'password'
   }
 ]
 
