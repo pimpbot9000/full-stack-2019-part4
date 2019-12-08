@@ -278,6 +278,17 @@ describe('with initial data in the DB', () => {
   })
 
   describe('delete post', () => {
+
+    test('deleting post with no token failes', async () =>{
+      const posts = await helper.getPosts()
+      
+
+      await api
+        .delete(`/api/posts/${posts[0].id}`)
+        .send()
+        .expect(401)
+    })
+
     test('delete existing post when post belongs to user and user is logged in', async () => {
 
       let posts = await helper.getPosts()
