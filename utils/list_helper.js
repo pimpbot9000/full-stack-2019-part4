@@ -23,7 +23,7 @@ const mostLikes = array => {
 
     const value = map.get(element.author)
     let newValue = 0
-    if (value == null) {
+    if (value === undefined) {
       newValue = element.likes
     } else {
       newValue = element.likes + value
@@ -53,7 +53,7 @@ const mostBlogs = array => {
   array.forEach(element => {
     let newValue = 0
     const value = map.get(element.author)
-    if (value == null) {
+    if (value === undefined) {
       newValue = 1
     } else {
       newValue = value + 1
