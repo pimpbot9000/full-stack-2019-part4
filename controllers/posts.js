@@ -37,7 +37,7 @@ postsRouter.post('/', async (request, response, next) => {
 
     const newPost = new Post({
       title: body.title,
-      author: body.author,
+      author: body.author ? body.author : user.name,
       url: body.url,
       user: user._id
     })

@@ -100,6 +100,40 @@ describe('with initial data in the DB', () => {
       )
     })
 
+    test('adding new post: if name of the user not provided, users name in DB will be used', async () => {
+
+      //login user!
+      const user = helper.initialUsers[0]
+      const authString = await login(user.username, user.password)
+
+      const title = 'async/await simplifies making async calls'
+
+      const newPost = {
+        title: title,
+        url: 'zzz',
+        likes: 0,
+        userId: user.id
+      }
+
+      const res = await api
+        .post('/api/posts')
+        .send(newPost)
+        .set({ Authorization: authString })
+        .expect(201) //201 created
+        .expect('Content-Type', /application\/json/)
+
+      expect(res.body.author).toBe(user.name)
+
+      const response = await api.get('/api/posts')
+
+      const titles = response.body.map(post => post.title)
+
+      expect(response.body.length).toBe(helper.initialPosts.length + 1)
+      expect(titles).toContain(
+        title
+      )
+    })
+
     test('a new post cannot be added with invalid token', async () => {
       const title = 'async/await simplifies making async calls'
 
@@ -157,7 +191,8 @@ describe('with initial data in the DB', () => {
       const authString = await login(user.username, user.password)
 
       const newPost = {
-        title: 'This is a title'
+        url: 'This is an url',
+        
       }
 
       await api
