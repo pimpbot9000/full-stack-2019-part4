@@ -231,6 +231,7 @@ describe('with initial data in the DB', () => {
 
       const updatedPost = {
         ...post,
+        title: 'new title',
         likes: post.likes + 1
       }
 
@@ -243,6 +244,7 @@ describe('with initial data in the DB', () => {
         .expect(200)
 
       expect(result.body.likes).toBe(post.likes + 1)
+      expect(result.body.title).toBe('new title')
     })
 
     test('update failes when user tries to update a post belonging to other user', async () => {
@@ -254,6 +256,7 @@ describe('with initial data in the DB', () => {
 
       const updatedPost = {
         ...post,
+        title: 'new title',
         likes: post.likes + 1
       }
 
@@ -267,7 +270,7 @@ describe('with initial data in the DB', () => {
 
     })
 
-    test('updating existing post with empty body should not change the entry', async () => {
+    test('updating existing post with empty request body should give +1 like', async () => {
       const posts = await helper.getPosts()
       const post = posts[0]
       const user = helper.initialUsers[0]
@@ -278,14 +281,26 @@ describe('with initial data in the DB', () => {
         .put(url)
         .set({ Authorization: authString })
         .send({})
-        .expect(200)
+        .expect(200)     
       
-      expect(result.body.title).toBe(post.title)
-      expect(result.body.author).toBe(post.author)
-      expect(result.body.likes).toBe(post.likes)
-      expect(result.body.url).toBe(post.url)
+      expect(result.body.likes).toBe(post.likes + 1)     
 
     })
+
+    test('updating likes failes with no authentication', async () => {
+      const posts = await helper.getPosts()
+      const post = posts[0]      
+      const url = `/api/posts/${post.id}`
+
+      await api
+        .put(url)        
+        .send({})
+        .expect(401) //unauthorized          
+          
+
+    })
+
+
 
     test('update item not found should return 404', async () => {
       const user = helper.initialUsers[0]

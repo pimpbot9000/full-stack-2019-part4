@@ -60,11 +60,14 @@ postsRouter.post('/', async (request, response, next) => {
  * 2. Does the post exist
  * 2. Does the post belong to the user
  * 
+ * Expect: empty request body just updates the likes +1
+ * No authorization required
  */
 postsRouter.put('/:id', async (request, response, next) => {
 
   const newPost = request.body
-
+  
+  // check if user is authenticated
   const result = await checkUser(request)
 
   if (!result.user) {
@@ -73,6 +76,21 @@ postsRouter.put('/:id', async (request, response, next) => {
 
   const user = result.user
 
+  // check if request body is empty
+  // if so, just update likes
+  if(Object.getOwnPropertyNames(request.body).length === 0){
+    try {
+      const post = await Post.findById(request.params.id)
+      if (!post) return response.status(404).end()
+      post.likes = post.likes + 1
+      await post.save()
+      return response.json(post.toJSON())
+    } catch (error) {
+      return next(error)
+    }
+  }
+
+  // body not empty -> update other fields
   try {
 
     const post = await Post.findById(request.params.id)
@@ -82,6 +100,7 @@ postsRouter.put('/:id', async (request, response, next) => {
     if (post.user.toString() === user._id.toString()) {
 
       post.title = newPost.title ? newPost.title : post.title
+      post.url = newPost.url ? newPost.url : post.url
       post.likes = newPost.likes ? newPost.likes : post.likes
       await post.save()
       response.json(post.toJSON())
