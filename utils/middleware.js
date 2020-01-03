@@ -6,7 +6,7 @@ const morganCustom = morgan((tokens, req, res) => {
 
   const method = tokens.method(req, res)
 
-  if (method === 'POST' || method === 'GET') {
+  if (method === 'POST' || method === 'GET' || method === 'DELETE') {
     const body = JSON.stringify(req.body)
     console.log([
       method,

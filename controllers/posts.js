@@ -50,7 +50,7 @@ postsRouter.post('/', async (request, response, next) => {
     const populatedPost = await Post
       .findOne({ _id: savedPost._id })
       .populate('user', { username: 1 })
-    
+
     response.status(201).json(populatedPost.toJSON())
 
   } catch (exception) {
@@ -67,6 +67,8 @@ postsRouter.post('/', async (request, response, next) => {
  * 
  * Expect: empty request body just updates the likes +1
  * No authorization required
+ * 
+ * Fun fact: Owner of the blog may arbitrarily change nof likes.
  */
 postsRouter.put('/:id', async (request, response, next) => {
 
@@ -81,11 +83,12 @@ postsRouter.put('/:id', async (request, response, next) => {
 
   const user = result.user
 
+
   // check if request body is empty
   // if so, just update likes
   if (Object.getOwnPropertyNames(request.body).length === 0) {
     try {
-      const post = await Post.findById(request.params.id)
+      const post = await Post.findById(request.params.id).populate('user', { username: 1 })      
       if (!post) return response.status(404).end()
       post.likes = post.likes + 1
       await post.save()
@@ -97,12 +100,10 @@ postsRouter.put('/:id', async (request, response, next) => {
 
   // body not empty -> update other fields
   try {
-
-    const post = await Post.findById(request.params.id)
-
+    const post = await Post.findById(request.params.id).populate('user', { username: 1 })
     if (!post) return response.status(404).end()
 
-    if (post.user.toString() === user._id.toString()) {
+    if (post.user._id.toString() === user._id.toString()) {
 
       post.title = newPost.title ? newPost.title : post.title
       post.url = newPost.url ? newPost.url : post.url

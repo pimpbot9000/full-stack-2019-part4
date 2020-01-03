@@ -232,6 +232,7 @@ describe('with initial data in the DB', () => {
       const updatedPost = {
         ...post,
         title: 'new title',
+        url: 'new url',
         likes: post.likes + 1
       }
 
@@ -244,7 +245,7 @@ describe('with initial data in the DB', () => {
         .expect(200)
 
       expect(result.body.likes).toBe(post.likes + 1)
-      expect(result.body.title).toBe('new title')
+      expect(result.body.url).toBe('new url')
     })
 
     test('update failes when user tries to update a post belonging to other user', async () => {
@@ -295,12 +296,9 @@ describe('with initial data in the DB', () => {
       await api
         .put(url)        
         .send({})
-        .expect(401) //unauthorized          
-          
+        .expect(401) //unauthorized      
 
     })
-
-
 
     test('update item not found should return 404', async () => {
       const user = helper.initialUsers[0]
@@ -332,7 +330,6 @@ describe('with initial data in the DB', () => {
     test('deleting post with no token failes', async () =>{
       const posts = await helper.getPosts()
       
-
       await api
         .delete(`/api/posts/${posts[0].id}`)
         .send()
@@ -358,10 +355,9 @@ describe('with initial data in the DB', () => {
       const nofPostsAfterDelete = posts.length
 
       expect(nofPostsAfterDelete).toBe(nofPosts - 1)
-
     })
 
-    test('delete existing post when post belongs to another user', async () => {
+    test('delete existing post when post belongs to another user (should return 401)', async () => {
 
       let posts = await helper.getPosts()
       const user = helper.initialUsers[1]
@@ -380,7 +376,6 @@ describe('with initial data in the DB', () => {
       const nofPostsAfterDelete = posts.length
 
       expect(nofPostsAfterDelete).toBe(nofPosts)
-
     })
 
     test('delete nonexisting post with properly formatted id (should return 200)', async () => {
@@ -392,7 +387,7 @@ describe('with initial data in the DB', () => {
         .delete(`/api/posts/${id}`)
         .set({ Authorization: authString })
         .send()
-        .expect(200)
+        .expect(200)        
     })
 
     test('delete post with malformatted id (should return 400: bad request )', async () => {
