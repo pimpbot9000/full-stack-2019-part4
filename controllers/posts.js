@@ -46,7 +46,12 @@ postsRouter.post('/', async (request, response, next) => {
     const savedPost = await newPost.save()
     user.posts = user.posts.concat(savedPost._id)
     await user.save()
-    response.status(201).json(savedPost.toJSON())
+
+    const populatedPost = await Post
+      .findOne({ _id: savedPost._id })
+      .populate('user', { username: 1 })
+    
+    response.status(201).json(populatedPost.toJSON())
 
   } catch (exception) {
     next(exception)
@@ -66,7 +71,7 @@ postsRouter.post('/', async (request, response, next) => {
 postsRouter.put('/:id', async (request, response, next) => {
 
   const newPost = request.body
-  
+
   // check if user is authenticated
   const result = await checkUser(request)
 
@@ -78,7 +83,7 @@ postsRouter.put('/:id', async (request, response, next) => {
 
   // check if request body is empty
   // if so, just update likes
-  if(Object.getOwnPropertyNames(request.body).length === 0){
+  if (Object.getOwnPropertyNames(request.body).length === 0) {
     try {
       const post = await Post.findById(request.params.id)
       if (!post) return response.status(404).end()
@@ -104,7 +109,7 @@ postsRouter.put('/:id', async (request, response, next) => {
       post.likes = newPost.likes ? newPost.likes : post.likes
       await post.save()
       response.json(post.toJSON())
-      
+
     } else {
       response.status(401).end()
     }
@@ -143,11 +148,11 @@ postsRouter.delete('/:id', async (request, response, next) => {
 
       await post.delete()
       response.status(200).end()
-      
+
     } else {
       response.status(401).end()
     }
-    
+
   } catch (error) {
     next(error)
   }
